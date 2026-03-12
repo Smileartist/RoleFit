@@ -71,6 +71,12 @@ export async function POST(request) {
 
     console.log('-------------------------------------------');
     console.log('[DEBUG] Raw Text Length:', rawText?.length);
+    if (!rawText || rawText.trim().length === 0) {
+      console.error('[RESUME UPLOAD] Text extraction failed - result is empty.');
+      return NextResponse.json({ 
+        error: 'We could not extract any text from this file. It might be an image-only PDF or a corrupted file. Please try a different version.' 
+      }, { status: 422 });
+    }
     console.log('[DEBUG] Is length > 20?', (rawText?.length > 20));
     console.log('-------------------------------------------');
 

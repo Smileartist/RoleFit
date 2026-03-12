@@ -1,13 +1,13 @@
-/**
- * PDF and DOCX text extraction using pdfjs-dist directly.
- * pdf-parse v2 changed its API, so we use the underlying pdfjs-dist.
- */
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
 export async function parsePdf(buffer) {
   try {
     const pdfParse = require('pdf-parse');
     const data = await pdfParse(buffer);
-    return { text: data.text.trim(), numpages: data.numpages };
+    const text = data.text || '';
+    console.log('[PARSER] PDF text extracted, length:', text.length);
+    return { text: text.trim(), numpages: data.numpages };
   } catch (err) {
     console.error('PDF parse error:', err);
     return { text: '', numpages: 0 };
