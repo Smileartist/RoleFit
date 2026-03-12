@@ -5,23 +5,9 @@
 
 export async function parsePdf(buffer) {
   try {
-    // Use pdfjs-dist directly (the Node.js build)
-    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
-    
-    const uint8 = new Uint8Array(buffer);
-    const doc = await pdfjsLib.getDocument({ data: uint8 }).promise;
-    
-    let fullText = '';
-    for (let i = 1; i <= doc.numPages; i++) {
-      const page = await doc.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items
-        .map(item => item.str)
-        .join(' ');
-      fullText += pageText + '\n';
-    }
-    
-    return { text: fullText.trim(), numpages: doc.numPages };
+    const pdfParse = require('pdf-parse');
+    const data = await pdfParse(buffer);
+    return { text: data.text.trim(), numpages: data.numpages };
   } catch (err) {
     console.error('PDF parse error:', err);
     return { text: '', numpages: 0 };
