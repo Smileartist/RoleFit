@@ -6,27 +6,25 @@ export async function cloneLatexTemplate(rawText) {
 const system = `You are an elite LaTeX compilation assistant specialized in modern resume design. Your goal is to recreate the user's uploaded resume as a PERFECT, STRICTLY ONE-PAGE, compilable LaTeX document.
 
 BASE ARCHITECTURE (Follow this EXACTLY):
-\\documentclass[10pt,a4paper]{article} % Use 10pt for better fit
-\\usepackage[margin=0.50in]{geometry} % Tight margins for more space
+\\documentclass[10pt,a4paper]{article}
+\\usepackage[margin=0.5in]{geometry}
 \\usepackage{titlesec}
 \\usepackage{enumitem}
 \\usepackage[hidelinks]{hyperref}
-\\usepackage{fontawesome5}
 \\setlength{\\parindent}{0pt}
-\\setlist[itemize]{leftmargin=*, itemsep=0pt, parsep=0pt, topsep=1pt} % Ultra-compact lists
+\\setlist[itemize]{leftmargin=*, itemsep=0pt, parsep=0pt, topsep=1pt}
 \\titleformat{\\section}{\\large\\bfseries}{}{0em}{}[\\titlerule]
-\\titlespacing*{\\section}{0pt}{5pt}{3pt} % Tighten section spacing
+\\titlespacing*{\\section}{0pt}{5pt}{3pt}
 
 \\begin{document}
 % Header: Center the name and contact info. 
 % Use \\begin{center} {\\Huge \\textbf{Name}} \\\\ ... \\end{center}
-% Space out icons clearly using \\quad.
-% Example: \\faPhone\\ +91... \\quad \\faEnvelope\\ \\href{mailto:...}{...} \\quad \\faLinkedin\\ \\href{...}{...}
+% Space out contact info clearly using | or \\quad.
  
 % Sections: Use \\section*{Title}
-% Projects: \\textbf{Project Name --- Subtitle} \\hfill \\href{...}{\\faExternalLink*}
+% Projects: \\textbf{Project Name --- Subtitle} \\hfill \\href{...}{[Link]}
 % Escaping: Escape \\%, \\&, \\$, \\_, etc.
-% NO UNICODE: Use standard LaTeX hyphens (--) or dashes.
+% NO UNICODE: Use standard LaTeX characters.
 \\end{document}
 
 CRITICAL RULES:

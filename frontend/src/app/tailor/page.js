@@ -37,6 +37,10 @@ function TailorContent() {
   const [selectedTailoredModal, setSelectedTailoredModal] = useState(null); // ID of past tailored resume to view
   const [modalPdfsLoading, setModalPdfsLoading] = useState(false);
   const [modalPreviewMode, setModalPreviewMode] = useState('text'); // 'text' | 'pdf'
+  const [originalPdfUrl, setOriginalPdfUrl] = useState('');
+  const [tailoredPdfUrl, setTailoredPdfUrl] = useState('');
+  const [modalOriginalPdfUrl, setModalOriginalPdfUrl] = useState('');
+  const [modalTailoredPdfUrl, setModalTailoredPdfUrl] = useState('');
 
   const originalResume = resumes.find(r => r.id === selectedResume)?.structured_data;
 
@@ -176,15 +180,20 @@ function TailorContent() {
   async function handleLoadPdfs() {
     setPreviewMode('pdf');
     setPdfsLoading(true);
+    setError('');
     try {
       const [origRes, tailRes] = await Promise.all([
         generatePdf(result.id, true),
         generatePdf(result.id, false)
       ]);
-      await Promise.all([
-        fetchAndRenderPdf(origRes.latex_content, 'iframe-original'),
-        fetchAndRenderPdf(tailRes.latex_content, 'iframe-tailored')
+      
+      const [origUrl, tailUrl] = await Promise.all([
+        compileLatexToUrl(origRes.latex_content),
+        compileLatexToUrl(tailRes.latex_content)
       ]);
+
+      setOriginalPdfUrl(origUrl);
+      setTailoredPdfUrl(tailUrl);
     } catch (err) {
       setError('Failed to load PDF preview: ' + err.message);
     } finally {
@@ -192,24 +201,32 @@ function TailorContent() {
     }
   }
 
-  async function fetchAndRenderPdf(latexText, iframeName) {
-    try {
-      const res = await fetch('/api/latex/compile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ latexCode: latexText }),
-      });
+  async function compileLatexToUrl(latexText) {
+    const res = await fetch('/api/latex/compile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ latexCode: latexText }),
+    });
 
-      if (!res.ok) throw new Error('LaTeX Compilation Error');
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      
-      const iframe = document.getElementsByName(iframeName)[0];
-      if (iframe) iframe.src = url;
-    } catch (e) {
-      console.error('PDF Render Error:', e);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || 'LaTeX Compilation Error');
     }
+    const blob = await res.blob();
+    return URL.createObjectURL(blob);
   }
+
+  // Helper to cleanup URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (originalPdfUrl) URL.revokeObjectURL(originalPdfUrl);
+      if (tailoredPdfUrl) URL.revokeObjectURL(tailoredPdfUrl);
+      if (modalOriginalPdfUrl) URL.revokeObjectURL(modalOriginalPdfUrl);
+      if (modalTailoredPdfUrl) URL.revokeObjectURL(modalTailoredPdfUrl);
+    };
+  }, [originalPdfUrl, tailoredPdfUrl, modalOriginalPdfUrl, modalTailoredPdfUrl]);
+
+  // Removed fetchAndRenderPdf as we now use compileLatexToUrl + State
 
   async function handleDeleteTailored(id, e) {
     e.stopPropagation(); // prevent modal opening
@@ -230,10 +247,12 @@ function TailorContent() {
         generatePdf(modalData.id, true),
         generatePdf(modalData.id, false)
       ]);
-      await Promise.all([
-        fetchAndRenderPdf(origRes.latex_content, 'modal-iframe-original'),
-        fetchAndRenderPdf(tailRes.latex_content, 'modal-iframe-tailored')
+      const [origUrl, tailUrl] = await Promise.all([
+        compileLatexToUrl(origRes.latex_content),
+        compileLatexToUrl(tailRes.latex_content)
       ]);
+      setModalOriginalPdfUrl(origUrl);
+      setModalTailoredPdfUrl(tailUrl);
     } catch (err) {
       setError('Failed to load PDF preview: ' + err.message);
     } finally {
@@ -468,11 +487,13 @@ function TailorContent() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
              <div className="card" style={{ padding: 0, height: '800px', display: 'flex', flexDirection: 'column' }}>
                 <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', fontSize: '0.875rem' }}>Original Resume (PDF)</h3>
-                <iframe name="iframe-original" style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                {!originalPdfUrl && pdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
+                <iframe src={originalPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
              </div>
              <div className="card" style={{ padding: 0, height: '800px', border: '1px solid var(--color-primary-light)', display: 'flex', flexDirection: 'column' }}>
                 <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', color: 'var(--color-primary-light)', fontSize: '0.875rem' }}>Tailored Optimized Resume (PDF)</h3>
-                <iframe name="iframe-tailored" style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                {!tailoredPdfUrl && pdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
+                <iframe src={tailoredPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
              </div>
           </div>
           )}
@@ -651,11 +672,13 @@ function TailorContent() {
               <div className="animate-in" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginTop: '1rem' }}>
                  <div className="card" style={{ padding: 0, height: '700px', display: 'flex', flexDirection: 'column' }}>
                     <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', fontSize: '0.875rem' }}>Original Resume (PDF)</h3>
-                    <iframe name="modal-iframe-original" style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                    {!modalOriginalPdfUrl && modalPdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
+                    <iframe src={modalOriginalPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
                  </div>
                  <div className="card" style={{ padding: 0, height: '700px', border: '1px solid var(--color-primary-light)', display: 'flex', flexDirection: 'column' }}>
                     <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', color: 'var(--color-primary-light)', fontSize: '0.875rem' }}>Tailored Optimized Resume (PDF)</h3>
-                    <iframe name="modal-iframe-tailored" style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                    {!modalTailoredPdfUrl && modalPdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
+                    <iframe src={modalTailoredPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
                  </div>
               </div>
             )}
