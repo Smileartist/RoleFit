@@ -173,6 +173,27 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
   template = template.replace(/\[EDUCATION-START\]([\s\S]*?)\[EDUCATION-END\]/g, eduLatexEntries);
   template = template.replace(/\[EDUCATION-ENTRIES\]/g, eduLatexEntries);
 
+  // 7. Certifications Engine
+  const certifications = tailoredData.certifications || [];
+  let certLatex = '';
+  if (certifications.length > 0) {
+    certLatex = certifications.map(c => escapeLatex(c)).join(', ');
+  }
+  
+  // Replace the old style section if it exists
+  const certRegex = /<<#CERTIFICATIONS>>[\s\S]*?<<\/CERTIFICATIONS>>/g;
+  if (certifications.length > 0) {
+    template = template.replace(certRegex, `\\section{Certifications}\n${certLatex}`);
+  } else {
+    template = template.replace(certRegex, '');
+  }
+
+  // 8. FINAL CLEANUP: Remove any orphaned tags that didn't get replaced
+  // This prevents LaTeX compilation errors if new fields are added to templates but not the generator
+  template = template
+    .replace(/<<#[A-Z_]+>>[\s\S]*?<<\/[A-Z_]+>>/g, '') // Remove empty sections
+    .replace(/<<[A-Z_-]+>>/g, '') // Remove orphaned tags
+    .replace(/\[[A-Z_-]+\]/g, ''); // Remove orphaned bracket tags
 
   return template;
 }
