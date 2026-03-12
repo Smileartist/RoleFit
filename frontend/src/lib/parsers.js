@@ -14,14 +14,28 @@ if (typeof global.Path2D === 'undefined') {
 
 export async function parsePdf(buffer) {
   try {
-    const pdfParse = require('pdf-parse');
-    const data = await pdfParse(buffer);
-    const text = data.text || '';
-    console.log('[PARSER] PDF text extracted, length:', text.length);
-    if (text.length > 0) {
-      console.log('[PARSER] Snippet:', text.substring(0, 50));
-    }
-    return { text: text.trim(), numpages: data.numpages };
+    const { PdfReader } = require('pdfreader');
+    
+    return new Promise((resolve, reject) => {
+      let fullText = '';
+      let pageCount = 0;
+      
+      new PdfReader().parseBuffer(buffer, (err, item) => {
+        if (err) {
+          console.error('PdfReader error:', err);
+          reject(err);
+        } else if (!item) {
+          // End of file
+          console.log('[PARSER] PdfReader finished. Text length:', fullText.length);
+          resolve({ text: fullText.trim(), numpages: pageCount });
+        } else if (item.page) {
+          pageCount++;
+          fullText += '\n'; // New page separator
+        } else if (item.text) {
+          fullText += item.text + ' ';
+        }
+      });
+    });
   } catch (err) {
     console.error('PDF parse error:', err);
     return { text: '', numpages: 0 };
