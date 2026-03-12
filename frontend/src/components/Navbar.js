@@ -17,7 +17,7 @@ export default function Navbar() {
     { href: '/projects', label: 'Projects', icon: '🛠️' },
     { href: '/jobs', label: 'Jobs', icon: '💼' },
     { href: '/tailor', label: 'Tailor', icon: '✨' },
-    { href: '/build', label: 'Build', icon: '🔨' },
+    { href: '/builder', label: 'Build', icon: '🔨' },
     { href: '/tracker', label: 'Tracker', icon: '📋' },
   ];
 
