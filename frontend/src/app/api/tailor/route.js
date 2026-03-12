@@ -7,6 +7,8 @@ import { scoreResume } from '@/lib/ai/atsScorer';
 import { generateProjectBullets } from '@/lib/ai/projectBulletGenerator';
 import { findRelevantProjects } from '@/lib/ai/embeddings';
 
+export const maxDuration = 60;
+
 // GET tailored resumes
 export async function GET(request) {
   const auth = verifyAuth(request);

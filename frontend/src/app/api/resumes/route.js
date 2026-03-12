@@ -4,6 +4,8 @@ import { verifyAuth } from '@/lib/auth';
 import { structureResume } from '@/lib/ai/resumeStructurer';
 import { cloneLatexTemplate } from '@/lib/ai/latexCloner';
 
+export const maxDuration = 60;
+
 // GET all resumes
 export async function GET(request) {
   const auth = verifyAuth(request);
@@ -76,28 +78,25 @@ export async function POST(request) {
     let structuredData = null;
     let latexTemplateData = null;
     if (rawText.length > 20) {
-      console.log('[RESUME UPLOAD] ENTERING AI BLOCK');
-      try {
-        structuredData = await structureResume(rawText);
-        if (!structuredData || Object.keys(structuredData).length === 0) {
-          console.warn('[RESUME UPLOAD] Structured data came back empty or null!');
-        } else {
-          console.log('[RESUME UPLOAD] Structuring succeeded. Name:', structuredData.name, 'Skills:', structuredData.skills?.length || 0);
-        }
-      } catch (structErr) {
-        console.error('[RESUME UPLOAD] Structuring FAILED:', structErr.message, structErr.stack);
+      console.log('[RESUME UPLOAD] ENTERING AI BLOCK (Concurrent execution)');
+      
+      const [structRes, latexRes] = await Promise.allSettled([
+         structureResume(rawText),
+         cloneLatexTemplate(rawText)
+      ]);
+
+      if (structRes.status === 'fulfilled') {
+        structuredData = structRes.value;
+        console.log('[RESUME UPLOAD] Structuring succeeded. Name:', structuredData?.name);
+      } else {
+        console.error('[RESUME UPLOAD] Structuring FAILED:', structRes.reason);
       }
 
-      console.log('[RESUME UPLOAD] Cloning LaTeX with AI...');
-      try {
-        latexTemplateData = await cloneLatexTemplate(rawText);
-        if (latexTemplateData) {
-          console.log('[RESUME UPLOAD] LaTeX cloning succeeded. Length:', latexTemplateData.length);
-        } else {
-          console.warn('[RESUME UPLOAD] LaTeX template came back empty!');
-        }
-      } catch (latexErr) {
-        console.error('[RESUME UPLOAD] LaTeX cloning FAILED:', latexErr.message, latexErr.stack);
+      if (latexRes.status === 'fulfilled') {
+        latexTemplateData = latexRes.value;
+        console.log('[RESUME UPLOAD] LaTeX cloning succeeded. Length:', latexTemplateData?.length);
+      } else {
+        console.error('[RESUME UPLOAD] LaTeX cloning FAILED:', latexRes.reason);
       }
     } else {
       console.warn('[RESUME UPLOAD] Raw text too short for AI structuring:', rawText.length, 'chars');
