@@ -7,6 +7,8 @@ const system = `You are an elite LaTeX compilation assistant specialized in mode
 
 BASE ARCHITECTURE (Follow this EXACTLY):
 \\documentclass[10pt,a4paper]{article}
+\\usepackage[utf8]{inputenc}
+\\usepackage[T1]{fontenc}
 \\usepackage[margin=0.5in]{geometry}
 \\usepackage{titlesec}
 \\usepackage{enumitem}

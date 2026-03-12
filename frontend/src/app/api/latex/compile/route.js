@@ -7,6 +7,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'latexCode is required.' }, { status: 400 });
     }
 
+    console.log('[LATEX COMPILE] Starting compilation proxy...');
+    console.log('[LATEX COMPILE] Code snippet (start):', latexCode.substring(0, 200));
+    console.log('[LATEX COMPILE] Code snippet (end):', latexCode.substring(latexCode.length - 200));
+
     const formData = new FormData();
     formData.append('filecontents[]', new Blob([latexCode], { type: 'text/plain' }), 'document.tex');
     formData.append('filename[]', 'document.tex');
