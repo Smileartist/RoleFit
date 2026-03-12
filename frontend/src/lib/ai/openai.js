@@ -34,9 +34,9 @@ const OPENAI_MODELS = {
 };
 
 const GEMINI_MODELS = {
-  light: 'gemini-2.5-flash-lite',
-  mid: 'gemini-2.5-flash-lite',
-  heavy: 'gemini-2.5-flash-lite',
+  light: 'gemini-1.5-flash',
+  mid: 'gemini-1.5-flash',
+  heavy: 'gemini-1.5-pro',
 };
 
 export async function chat(systemPrompt, userContent, options = {}) {

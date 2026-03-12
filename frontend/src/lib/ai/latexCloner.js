@@ -42,6 +42,11 @@ ${rawText.substring(0, 8000)}
 
   const response = await chat(system, user, { model: MODEL.HEAVY, temperature: 0.1 });
   
+  if (!response) {
+     console.error('[LATEX CLONER] Received empty or null response from AI.');
+     return `\\documentclass{article}\\begin{document}Error: AI failed to clone LaTeX\\end{document}`;
+  }
+
   // Clean off markdown blocks if the AI accidentally adds them
   let cleaned = response.trim();
   if (cleaned.startsWith('\`\`\`latex')) {
