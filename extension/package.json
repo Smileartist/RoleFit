@@ -1,0 +1,32 @@
+{
+  "name": "rolefit-extension",
+  "displayName": "RoleFit — AI Resume Tailor",
+  "version": "1.0.0",
+  "description": "Automatically extract job descriptions from job pages and generate tailored resumes with RoleFit.",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
+  },
+  "dependencies": {
+    "plasmo": "^0.88.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.260"
+  },
+  "manifest": {
+    "permissions": ["activeTab", "storage"],
+    "host_permissions": [
+      "https://www.linkedin.com/*",
+      "https://linkedin.com/*",
+      "https://www.indeed.com/*",
+      "https://indeed.com/*",
+      "https://internshala.com/*",
+      "https://www.internshala.com/*",
+      "https://unstop.com/*",
+      "https://www.unstop.com/*"
+    ]
+  }
+}

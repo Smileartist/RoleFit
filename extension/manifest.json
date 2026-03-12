@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "RoleFit — AI Resume Tailor",
+  "version": "1.0.0",
+  "description": "Extract job descriptions from job pages and generate tailored resumes with RoleFit.",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "https://linkedin.com/*",
+    "https://www.indeed.com/*",
+    "https://indeed.com/*",
+    "https://internshala.com/*",
+    "https://www.internshala.com/*",
+    "https://unstop.com/*",
+    "https://www.unstop.com/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "RoleFit"
+  },
+  "icons": {}
+}

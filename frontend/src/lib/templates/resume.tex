@@ -1,0 +1,67 @@
+%% RoleFit Resume Template
+%% LaTeX template for ATS-optimized resume generation
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=0.6in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fontenc}
+\usepackage{inputenc}
+
+% Disable page numbers
+\pagestyle{empty}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries\uppercase}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{6pt}{4pt}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% ===== HEADER =====
+\begin{center}
+  {\LARGE\textbf{<<NAME>>}} \\[4pt]
+  <<EMAIL>> \quad | \quad <<PHONE>> \quad | \quad <<LOCATION>>
+\end{center}
+
+% ===== SUMMARY =====
+<<#SUMMARY>>
+\section{Summary}
+<<SUMMARY>>
+<</SUMMARY>>
+
+% ===== SKILLS =====
+<<#SKILLS>>
+\section{Technical Skills}
+<<SKILLS>>
+<</SKILLS>>
+
+% ===== EXPERIENCE =====
+<<#EXPERIENCE>>
+\section{Experience}
+<<EXPERIENCE_ENTRIES>>
+<</EXPERIENCE>>
+
+% ===== PROJECTS =====
+<<#PROJECTS>>
+\section{Projects}
+<<PROJECT_ENTRIES>>
+<</PROJECTS>>
+
+% ===== EDUCATION =====
+<<#EDUCATION>>
+\section{Education}
+<<EDUCATION_ENTRIES>>
+<</EDUCATION>>
+
+% ===== CERTIFICATIONS =====
+<<#CERTIFICATIONS>>
+\section{Certifications}
+<<CERTIFICATIONS>>
+<</CERTIFICATIONS>>
+
+\end{document}
