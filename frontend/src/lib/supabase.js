@@ -7,6 +7,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
   console.warn('⚠️  Supabase credentials not configured.');
 }
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+export const supabaseAdmin = createClient(
+  supabaseUrl || 'http://localhost:3000', 
+  supabaseServiceKey || 'dummy_key', 
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
