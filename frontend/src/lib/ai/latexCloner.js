@@ -3,18 +3,19 @@ import { chat, MODEL } from './openai';
 export async function cloneLatexTemplate(rawText) {
   if (!rawText || rawText.trim().length < 20) throw new Error('Resume text is too short to clone.');
 
-  const system = `You are an elite LaTeX compilation assistant specialized in modern resume design. Your goal is to recreate the user's uploaded resume as a PERFECT, compilable LaTeX document.
+const system = `You are an elite LaTeX compilation assistant specialized in modern resume design. Your goal is to recreate the user's uploaded resume as a PERFECT, STRICTLY ONE-PAGE, compilable LaTeX document.
 
 BASE ARCHITECTURE (Follow this EXACTLY):
-\\documentclass[11pt,a4paper]{article}
-\\usepackage[margin=0.70in]{geometry}
+\\documentclass[10pt,a4paper]{article} % Use 10pt for better fit
+\\usepackage[margin=0.50in]{geometry} % Tight margins for more space
 \\usepackage{titlesec}
 \\usepackage{enumitem}
 \\usepackage[hidelinks]{hyperref}
 \\usepackage{fontawesome5}
 \\setlength{\\parindent}{0pt}
-\\setlist[itemize]{leftmargin=*, itemsep=1pt, topsep=2pt}
+\\setlist[itemize]{leftmargin=*, itemsep=0pt, parsep=0pt, topsep=1pt} % Ultra-compact lists
 \\titleformat{\\section}{\\large\\bfseries}{}{0em}{}[\\titlerule]
+\\titlespacing*{\\section}{0pt}{5pt}{3pt} % Tighten section spacing
 
 \\begin{document}
 % Header: Center the name and contact info. 
@@ -29,12 +30,12 @@ BASE ARCHITECTURE (Follow this EXACTLY):
 \\end{document}
 
 CRITICAL RULES:
-1. ONE-PAGE LIMIT: Prioritize a clean, single-page layout. If the content is long, condense bullet points to ensure it fits without feeling "cramped".
-2. SPACING: Ensure sections have balanced vertical space. Do not overlap lines.
-3. HEADER ICONS: Every link (LinkedIn, GitHub) MUST have its icon (\faLinkedin, \faGithub, etc.) and the clickable link text next to it.
+1. STRICT ONE-PAGE LIMIT: It is better to skip a very minor bullet point than to let the content overflow to a second page. 
+2. CONDENSE: If there are many projects or experiences, condense the bullet points for the older/less relevant ones.
+3. SPACING: Use the provided titlespacing and enumitem settings to keep everything compact.
 4. Output ONLY raw LaTeX code. No code blocks or markdown.`;
 
-  const user = `Here is the raw text extracted from the user's resume PDF. Generate the EXACT LaTeX code for their resume data using the reference architecture provided in your system instructions:
+  const user = `Here is the raw text extracted from the user's resume PDF. Generate the STRICTLY ONE-PAGE LaTeX code using the reference architecture provided:
 
 """
 ${rawText.substring(0, 8000)}
