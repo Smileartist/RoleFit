@@ -7,6 +7,8 @@ export const metadata = {
   description: 'AI-powered resume tailoring platform. Generate ATS-optimized resumes tailored for specific job roles.',
 };
 
+import { Analytics } from '@vercel/analytics/react';
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -21,6 +23,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           <main>{children}</main>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
