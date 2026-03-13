@@ -142,7 +142,7 @@ Track job applications
 
 URL
 
-https://rolefit.smileartist.org
+https://rolefitai.smileartist.org
 
 ---
 
