@@ -3,9 +3,10 @@
 
 \documentclass[11pt,a4paper]{article}
 
-\usepackage[margin=0.6in]{geometry}
+\usepackage[left=0.4in, top=0.3in, right=0.4in, bottom=0.3in]{geometry}
 \usepackage{enumitem}
 \usepackage{titlesec}
+\usepackage{fontawesome5}
 \usepackage[hidelinks]{hyperref}
 \usepackage{fontenc}
 \usepackage{inputenc}
@@ -15,17 +16,20 @@
 
 % Section formatting
 \titleformat{\section}{\large\bfseries\uppercase}{}{0em}{}[\titlerule]
-\titlespacing*{\section}{0pt}{6pt}{4pt}
+\titlespacing*{\section}{0pt}{5pt}{3pt}
 
 % Remove paragraph indentation
 \setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=*, itemsep=0pt, parsep=0pt, topsep=1pt}
 
 \begin{document}
 
 % ===== HEADER =====
 \begin{center}
-  {\LARGE\textbf{<<NAME>>}} \\[4pt]
-  <<EMAIL>> \quad | \quad <<PHONE>> \quad | \quad <<LOCATION>>
+  {\LARGE\textbf{<<NAME>>}} \\[3pt]
+  \small
+  \faMapMarker\ {<<LOCATION>>} \quad | \quad \faPhone\ {<<PHONE>>} \quad | \quad \faEnvelope\ {<<EMAIL>>} \\[2pt]
+  {<<LINKEDIN>>} \quad {<<GITHUB>>} \quad {<<PORTFOLIO>>}
 \end{center}
 
 % ===== SUMMARY =====

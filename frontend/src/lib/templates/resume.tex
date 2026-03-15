@@ -2,9 +2,10 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[margin=0.4in]{geometry}
+\usepackage[left=0.4in, top=0.3in, right=0.4in, bottom=0.3in]{geometry}
 \usepackage{enumitem}
 \usepackage{titlesec}
+\usepackage{fontawesome5}
 \usepackage[hidelinks]{hyperref}
 
 % Disable page numbers
@@ -12,7 +13,7 @@
 
 % Section formatting
 \titleformat{\section}{\large\bfseries\uppercase}{}{0em}{}[\titlerule]
-\titlespacing*{\section}{0pt}{4pt}{2pt}
+\titlespacing*{\section}{0pt}{5pt}{3pt}
 
 % Remove paragraph indentation
 \setlength{\parindent}{0pt}
@@ -22,8 +23,10 @@
 
 % ===== HEADER =====
 \begin{center}
-  {\LARGE\textbf{<<NAME>>}} \\[4pt]
-  <<EMAIL>> \quad | \quad <<PHONE>> \quad | \quad <<LOCATION>>
+  {\LARGE\textbf{<<NAME>>}} \\[3pt]
+  \small
+  \faMapMarker\ {<<LOCATION>>} \quad | \quad \faPhone\ {<<PHONE>>} \quad | \quad \faEnvelope\ {<<EMAIL>>} \\[2pt]
+  {<<LINKEDIN>>} \quad {<<GITHUB>>} \quad {<<PORTFOLIO>>}
 \end{center}
 
 % ===== SUMMARY =====

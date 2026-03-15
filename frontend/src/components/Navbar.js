@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const pathname = usePathname();
 
   if (!user) return null;
@@ -55,11 +55,6 @@ export default function Navbar() {
               <span className="nav-icon">👤</span>
               Profile
             </Link>
-          </li>
-          <li>
-            <button onClick={logout} className="btn btn-ghost btn-sm" style={{ marginLeft: '0.5rem' }}>
-              Logout
-            </button>
           </li>
         </ul>
       </nav>

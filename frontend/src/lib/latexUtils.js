@@ -82,7 +82,19 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
   template = replaceTag(template, 'USER-EMAIL', escapeLatex(tailoredData.email || 'email@example.com'));
   template = replaceTag(template, 'USER-PHONE', escapeLatex(tailoredData.phone || ''));
   template = replaceTag(template, 'USER-LOCATION', escapeLatex(tailoredData.location || ''));
-  template = replaceTag(template, 'USER-LINKS', escapeLatex(tailoredData.links?.join(' | ') || ''));
+  
+  // Social Links with Icons
+  const linkedin = tailoredData.linkedin ? `\\href{${tailoredData.linkedin}}{\\faLinkedin\\ LinkedIn}` : '';
+  const github = tailoredData.github ? `\\href{${tailoredData.github}}{\\faGithub\\ GitHub}` : '';
+  const portfolio = tailoredData.portfolio ? `\\href{${tailoredData.portfolio}}{\\faGlobe\\ Portfolio}` : '';
+  
+  template = replaceTag(template, 'USER-LINKEDIN', linkedin);
+  template = replaceTag(template, 'USER-GITHUB', github);
+  template = replaceTag(template, 'USER-PORTFOLIO', portfolio);
+  
+  // Legacy or combined links support
+  const links = [linkedin, github, portfolio].filter(Boolean).join(' \\quad ');
+  template = replaceTag(template, 'USER-LINKS', links);
 
   // 2. Summary
   template = replaceSection(template, 'SUMMARY', tailoredData.summary, (block, data) => {
@@ -105,7 +117,7 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
       if (bulletsToUse.length > 0) {
         entries += `\\begin{itemize}[leftmargin=*,itemsep=0pt]\n`;
         bulletsToUse.forEach(b => entries += `  \\item {${escapeLatex(b)}}\n`);
-        entries += `\\end{itemize}\n\\vspace{4pt}\n`;
+        entries += `\\end{itemize}\n\\vspace{2pt}\n`;
       }
     });
     return block.replace(/\[EXPERIENCE-ENTRIES\]|<<EXPERIENCE_ENTRIES>>/gi, entries);
@@ -116,7 +128,14 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
   template = replaceSection(template, 'PROJECTS', projects, (block, data) => {
     let entries = '';
     data.forEach(proj => {
-      const nameLine = `\\textbf{${escapeLatex(proj.name)}}`;
+      let nameLine = `\\textbf{${escapeLatex(proj.name)}}`;
+      
+      // Project Links (GitHub and Demo)
+      let projectLinks = '';
+      if (proj.github) projectLinks += `\\href{${proj.github}}{\\faGithub} `;
+      if (proj.url) projectLinks += `\\href{${proj.url}}{\\faExternalLinkAlt}`;
+      if (projectLinks) nameLine += ` \\hfill ${projectLinks}`;
+
       let joinedTechStack = '';
       if (Array.isArray(proj.tech_stack)) joinedTechStack = proj.tech_stack.join(', ');
       else if (typeof proj.techStack === 'string') joinedTechStack = proj.techStack;
@@ -129,7 +148,7 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
       if (bullets.length > 0) {
          entries += `\\begin{itemize}[leftmargin=*,itemsep=0pt]\n`;
          bullets.forEach(b => entries += `  \\item {${escapeLatex(b)}}\n`);
-         entries += `\\end{itemize}\n\\vspace{4pt}\n`;
+         entries += `\\end{itemize}\n\\vspace{2pt}\n`;
       }
     });
     return block.replace(/\[PROJECT-ENTRIES\]|<<PROJECT_ENTRIES>>/gi, entries);
@@ -140,7 +159,11 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
     let entries = '';
     const eduList = Array.isArray(data) ? data : [];
     eduList.forEach(edu => {
-      entries += `\\textbf{${escapeLatex(edu.degree)}} ${edu.institution ? '— ' + escapeLatex(edu.institution) : ''} \\hfill ${escapeLatex(edu.year)} \\\\\n`;
+      entries += `\\textbf{${escapeLatex(edu.degree)}} ${edu.institution ? '— ' + escapeLatex(edu.institution) : ''} \\hfill ${escapeLatex(edu.year || '')} \\\\\n`;
+      if (edu.details) {
+        entries += `\\textit{${escapeLatex(edu.details)}} \\\\\n`;
+      }
+      entries += `\\vspace{2pt}\n`;
     });
     return block.replace(/\[EDUCATION-ENTRIES\]|<<EDUCATION_ENTRIES>>/gi, entries);
   });
