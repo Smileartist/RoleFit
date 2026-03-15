@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getMe, login as apiLogin, register as apiRegister, logout as apiLogout, isLoggedIn } from '@/lib/api';
+import { getMe, login as apiLogin, register as apiRegister, logout as apiLogout, isLoggedIn, updateProfile as apiUpdateProfile, updatePassword as apiUpdatePassword, deleteAccount as apiDeleteAccount } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext(null);
@@ -43,8 +43,25 @@ export function AuthProvider({ children }) {
     router.push('/login');
   };
 
+  const updateProfile = async (name) => {
+    const data = await apiUpdateProfile(name);
+    setUser(data.user);
+    return data;
+  };
+
+  const updatePassword = async (currentPassword, newPassword) => {
+    return apiUpdatePassword(currentPassword, newPassword);
+  };
+
+  const deleteAccount = async () => {
+    await apiDeleteAccount();
+    apiLogout();
+    setUser(null);
+    router.push('/login');
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateProfile, updatePassword, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

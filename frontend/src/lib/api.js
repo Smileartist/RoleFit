@@ -73,6 +73,26 @@ export function isLoggedIn() {
   return !!getToken();
 }
 
+export async function updateProfile(name) {
+  return apiFetch('/auth/profile', {
+    method: 'PUT',
+    body: JSON.stringify({ name }),
+  });
+}
+
+export async function updatePassword(currentPassword, newPassword) {
+  return apiFetch('/auth/password', {
+    method: 'PUT',
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}
+
+export async function deleteAccount() {
+  return apiFetch('/auth/account', {
+    method: 'DELETE',
+  });
+}
+
 // ==================== Resumes ====================
 export async function uploadResume(file, title) {
   const formData = new FormData();

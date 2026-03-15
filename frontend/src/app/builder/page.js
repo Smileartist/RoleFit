@@ -131,25 +131,25 @@ export default function BuildResumePage() {
 
   return (
     <div className="page-container animate-in" style={{ maxWidth: '1600px' }}>
-      <div className="page-header" style={{ marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
+      <div className="page-header" style={{ marginBottom: '1.5rem' }}>
+        <div className="builder-header-flex">
+          <div className="builder-title-section">
             <h1>🔨 Build Resume</h1>
             <p>Write raw LaTeX from scratch using our ATS-friendly boilerplate</p>
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button className="btn btn-secondary" onClick={() => setLatexCode(DEFAULT_LATEX)}>Reset Boilerplate</button>
-            <button className="btn btn-secondary" onClick={handleDownloadTex}>Download .tex</button>
-            <button className="btn btn-primary" onClick={handleCompile} disabled={isCompiling}>
+          <div className="builder-actions">
+            <button className="btn btn-secondary btn-sm" onClick={() => setLatexCode(DEFAULT_LATEX)}>Reset Boilerplate</button>
+            <button className="btn btn-secondary btn-sm" onClick={handleDownloadTex}>Download .tex</button>
+            <button className="btn btn-primary btn-sm" onClick={handleCompile} disabled={isCompiling}>
                {isCompiling ? '🔄 Compiling...' : '🚀 Compile PDF'}
             </button>
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', height: 'calc(100vh - 200px)', minHeight: '600px' }}>
+      <div className="builder-grid">
         {/* Editor Side */}
-        <div className="card" style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
+        <div className="card builder-editor-container" style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '0.75rem 1rem', background: '#2d2d2d', color: '#fff', fontWeight: 600, borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem' }}>
              📝 LaTeX Editor
           </div>
@@ -167,7 +167,7 @@ export default function BuildResumePage() {
         </div>
 
         {/* PDF Preview Side */}
-        <div className="card" style={{ padding: 0, display: 'flex', flexDirection: 'column', border: '1px solid var(--color-primary-light)' }}>
+        <div className="card builder-preview-container" style={{ padding: 0, display: 'flex', flexDirection: 'column', border: '1px solid var(--color-primary-light)' }}>
           <div style={{ padding: '0.75rem 1rem', background: 'var(--color-surface)', color: 'var(--color-primary-light)', fontWeight: 600, borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem' }}>
              📄 Live PDF Preview
           </div>
@@ -177,6 +177,29 @@ export default function BuildResumePage() {
           />
         </div>
       </div>
+      <style jsx>{`
+        .builder-header-flex {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+        .builder-actions {
+          display: flex;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+        }
+        @media (max-width: 600px) {
+          .builder-actions {
+            width: 100%;
+          }
+          .builder-actions button {
+            flex: 1;
+            justify-content: center;
+          }
+        }
+      `}</style>
     </div>
   );
 }

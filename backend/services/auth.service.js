@@ -77,6 +77,67 @@ async function getProfile(userId) {
 }
 
 /**
+ * Update user profile.
+ */
+async function updateProfile(userId, { name }) {
+  const { data: user, error } = await supabaseAdmin
+    .from('users')
+    .update({ name })
+    .eq('id', userId)
+    .select('id, name, email, created_at')
+    .single();
+
+  if (error) throw new Error(error.message);
+  return user;
+}
+
+/**
+ * Update user password.
+ */
+async function updatePassword(userId, { currentPassword, newPassword }) {
+  const { data: user, error } = await supabaseAdmin
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error || !user) {
+    throw Object.assign(new Error('User not found.'), { status: 404 });
+  }
+
+  const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+  if (!isMatch) {
+    throw Object.assign(new Error('Current password is incorrect.'), { status: 401 });
+  }
+
+  const password_hash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+  const { error: updateError } = await supabaseAdmin
+    .from('users')
+    .update({ password_hash })
+    .eq('id', userId);
+
+  if (updateError) throw new Error(updateError.message);
+  return { message: 'Password updated successfully' };
+}
+
+/**
+ * Delete user account and all associated data.
+ */
+async function deleteAccount(userId) {
+  // Cascading deletes should be handled by DB if possible, but let's be explicit if needed.
+  // Assuming foreign keys are set to ON DELETE CASCADE in Supabase/Postgres.
+  // If not, we might need to delete from resumes, projects, etc. manually.
+  
+  const { error } = await supabaseAdmin
+    .from('users')
+    .delete()
+    .eq('id', userId);
+
+  if (error) throw new Error(error.message);
+  return { message: 'Account deleted successfully' };
+}
+
+/**
  * Generate a JWT token for a user.
  */
 function generateToken(user) {
@@ -87,4 +148,4 @@ function generateToken(user) {
   );
 }
 
-module.exports = { register, login, getProfile };
+module.exports = { register, login, getProfile, updateProfile, updatePassword, deleteAccount };

@@ -51,6 +51,12 @@ export default function Navbar() {
             </li>
           ))}
           <li>
+            <Link href="/profile" className={pathname === '/profile' ? 'active' : ''}>
+              <span className="nav-icon">👤</span>
+              Profile
+            </Link>
+          </li>
+          <li>
             <button onClick={logout} className="btn btn-ghost btn-sm" style={{ marginLeft: '0.5rem' }}>
               Logout
             </button>
@@ -58,14 +64,14 @@ export default function Navbar() {
         </ul>
       </nav>
 
-      {/* Mobile Top Bar — minimal, just logo + logout */}
+      {/* Mobile Top Bar — logo + profile link */}
       <nav className="mobile-topbar">
         <Link href="/dashboard" className="navbar-brand">
           🎯 <span>RoleFit</span>
         </Link>
-        <button onClick={logout} className="btn btn-ghost btn-sm">
-          Logout
-        </button>
+        <Link href="/profile" className={`btn btn-ghost btn-sm ${pathname === '/profile' ? 'active' : ''}`}>
+          👤 Profile
+        </Link>
       </nav>
 
       {/* Mobile Bottom Tab Bar */}
