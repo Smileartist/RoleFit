@@ -95,9 +95,18 @@ export default function DashboardPage() {
 
   return (
     <div className="page-container animate-in">
-      <div className="page-header" style={{ marginBottom: '2rem' }}>
-        <h1>Welcome back, {user.name?.split(' ')[0]} 👋</h1>
-        <p>Let&apos;s land your dream role.</p>
+      <div className="dashboard-hero">
+        <img 
+          src="/logo-wide.png?v=5" 
+          alt="RoleFit Logo" 
+          className="dashboard-hero-logo"
+        />
+        <h1 className="dashboard-hero-title">
+          Tailor Your Resume. Land More Interviews.
+        </h1>
+        <p className="dashboard-hero-tagline">
+          AI-powered ATS optimization for your dream career.
+        </p>
       </div>
 
       {/* Massive Quick Tailor CTA */}

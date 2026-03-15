@@ -8,7 +8,39 @@ export default function Navbar() {
   const { user } = useAuth();
   const pathname = usePathname();
 
-  if (!user) return null;
+  // If no user, show a simplified navbar with just the logo
+  if (!user) {
+    return (
+      <>
+        <nav className="desktop-navbar">
+          <Link href="/" className="navbar-brand">
+            <img 
+              src="/logo-wide.png?v=5" 
+              alt="RoleFit Logo" 
+              className="logo-img" 
+              fetchPriority="high"
+              decoding="async"
+            />
+          </Link>
+          <div className="navbar-links">
+            <Link href="/login" className="btn btn-ghost btn-sm">Sign In</Link>
+            <Link href="/register" className="btn btn-primary btn-sm">Get Started</Link>
+          </div>
+        </nav>
+        <nav className="mobile-topbar">
+          <Link href="/" className="navbar-brand">
+            <img 
+              src="/logo-wide.png?v=5" 
+              alt="RoleFit Logo" 
+              className="logo-img" 
+              fetchPriority="high"
+              decoding="async"
+            />
+          </Link>
+        </nav>
+      </>
+    );
+  }
 
   // Main nav links with icons
   const links = [
@@ -30,9 +62,19 @@ export default function Navbar() {
     <>
       {/* Desktop Top Navbar */}
       <nav className="desktop-navbar">
-        <Link href="/dashboard" className="navbar-brand">
-          🎯 <span>RoleFit</span>
-        </Link>
+        {pathname === '/dashboard' ? (
+          <div className="navbar-brand-placeholder" style={{ width: '140px' }}></div>
+        ) : (
+          <Link href="/dashboard" className="navbar-brand">
+            <img 
+              src="/logo-wide.png?v=5" 
+              alt="RoleFit Logo" 
+              className="logo-img" 
+              fetchPriority="high"
+              decoding="async"
+            />
+          </Link>
+        )}
         <ul className="navbar-links">
           {links.map((link) => (
             <li key={link.href}>
@@ -61,9 +103,19 @@ export default function Navbar() {
 
       {/* Mobile Top Bar — logo + profile link */}
       <nav className="mobile-topbar">
-        <Link href="/dashboard" className="navbar-brand">
-          🎯 <span>RoleFit</span>
-        </Link>
+        {pathname === '/dashboard' ? (
+          <div className="navbar-brand-placeholder"></div>
+        ) : (
+          <Link href="/dashboard" className="navbar-brand">
+            <img 
+              src="/logo-wide.png?v=5" 
+              alt="RoleFit Logo" 
+              className="logo-img" 
+              fetchPriority="high"
+              decoding="async"
+            />
+          </Link>
+        )}
         <Link href="/profile" className={`btn btn-ghost btn-sm ${pathname === '/profile' ? 'active' : ''}`}>
           👤 Profile
         </Link>

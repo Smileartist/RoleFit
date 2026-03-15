@@ -38,7 +38,13 @@ export default function LoginPage() {
     }}>
       <div className="card animate-in" style={{ width: '100%', maxWidth: '420px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎯</div>
+          <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+            <img 
+              src="/logo-wide.png?v=5" 
+              alt="RoleFit Logo" 
+              style={{ height: '48px', width: 'auto', borderRadius: '10px' }} 
+            />
+          </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Welcome Back</h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>
             Sign in to your RoleFit account

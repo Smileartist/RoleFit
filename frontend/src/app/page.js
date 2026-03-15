@@ -28,7 +28,13 @@ export default function Home() {
         background: 'radial-gradient(ellipse at top, rgba(99, 102, 241, 0.12) 0%, transparent 60%)',
       }}>
         <div style={{ maxWidth: '680px' }}>
-          <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎯</div>
+          <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'center' }}>
+            <img 
+              src="/logo-wide.png?v=5" 
+              alt="RoleFit Logo" 
+              style={{ height: '64px', width: 'auto', borderRadius: '12px' }} 
+            />
+          </div>
           <h1 style={{
             fontSize: '3rem',
             fontWeight: 800,
