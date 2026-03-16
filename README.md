@@ -300,6 +300,7 @@ RoleFit is part of the SmileArtist ecosystem.
 smileartist.org
 app.smileartist.org
 rolefit.smileartist.org
+promptai.smileartist.org
 
 ---
 
