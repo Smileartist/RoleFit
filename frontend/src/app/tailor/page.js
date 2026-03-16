@@ -273,7 +273,7 @@ function TailorContent() {
       <div className="card" style={{ marginBottom: '2rem' }}>
         {error && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>{error}</div>}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+        <div className="grid-2-col" style={{ marginBottom: '1rem' }}>
           <div className="input-group">
             <label>Select Resume</label>
             <select className="input" value={selectedResume} onChange={e => setSelectedResume(e.target.value)}>
@@ -310,7 +310,7 @@ function TailorContent() {
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h3 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>ATS Match Score</h3>
             
-            <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
               
               {/* Original Score */}
               {result.ats_feedback?.original_score !== undefined && (
@@ -380,7 +380,7 @@ function TailorContent() {
           </div>
 
           {previewMode === 'text' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div className="grid-2-col">
             {/* Original Resume Text */}
             <div className="card" style={{ maxHeight: '400px', overflow: 'auto' }}>
               <h3 style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--color-text-muted)' }}>Original Resume</h3>
@@ -484,16 +484,16 @@ function TailorContent() {
           </div>
           </div>
           ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div className="grid-2-col">
              <div className="card" style={{ padding: 0, height: '800px', display: 'flex', flexDirection: 'column' }}>
                 <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', fontSize: '0.875rem' }}>Original Resume (PDF)</h3>
                 {!originalPdfUrl && pdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
-                <iframe src={originalPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                {originalPdfUrl && <iframe src={originalPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />}
              </div>
              <div className="card" style={{ padding: 0, height: '800px', border: '1px solid var(--color-primary-light)', display: 'flex', flexDirection: 'column' }}>
                 <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', color: 'var(--color-primary-light)', fontSize: '0.875rem' }}>Tailored Optimized Resume (PDF)</h3>
                 {!tailoredPdfUrl && pdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
-                <iframe src={tailoredPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                {tailoredPdfUrl && <iframe src={tailoredPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />}
              </div>
           </div>
           )}
@@ -602,7 +602,7 @@ function TailorContent() {
             <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>Tailored on {new Date(selectedTailoredModal.created_at).toLocaleDateString()}</p>
 
             {/* ATS Score Rings */}
-            <div className="card" style={{ display: 'flex', justifyContent: 'center', gap: '4rem', alignItems: 'center', marginBottom: '2rem', background: 'var(--color-surface)' }}>
+            <div className="card" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '2rem', alignItems: 'center', marginBottom: '2rem', background: 'var(--color-surface)' }}>
               {/* Original Score */}
               {selectedTailoredModal.ats_feedback?.original_score !== undefined && (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -649,7 +649,7 @@ function TailorContent() {
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
               <button className="btn btn-primary" onClick={() => handleDownloadPdf(selectedTailoredModal.id)} disabled={pdfGenerating}>
                 {pdfGenerating ? 'Generating...' : '📄 Download Tailored PDF'}
               </button>
@@ -659,7 +659,7 @@ function TailorContent() {
             </div>
 
             {/* Toggle Preview Mode */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem', justifyContent: 'center' }}>
               <button className={`btn ${modalPreviewMode === 'text' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setModalPreviewMode('text')}>
                 📝 Stats View
               </button>
@@ -669,16 +669,16 @@ function TailorContent() {
             </div>
 
             {modalPreviewMode === 'pdf' && (
-              <div className="animate-in" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginTop: '1rem' }}>
+              <div className="animate-in grid-2-col" style={{ marginTop: '1rem' }}>
                  <div className="card" style={{ padding: 0, height: '700px', display: 'flex', flexDirection: 'column' }}>
                     <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', fontSize: '0.875rem' }}>Original Resume (PDF)</h3>
                     {!modalOriginalPdfUrl && modalPdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
-                    <iframe src={modalOriginalPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                    {modalOriginalPdfUrl && <iframe src={modalOriginalPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />}
                  </div>
                  <div className="card" style={{ padding: 0, height: '700px', border: '1px solid var(--color-primary-light)', display: 'flex', flexDirection: 'column' }}>
                     <h3 style={{ padding: '1rem', margin: 0, background: 'var(--color-surface)', color: 'var(--color-primary-light)', fontSize: '0.875rem' }}>Tailored Optimized Resume (PDF)</h3>
                     {!modalTailoredPdfUrl && modalPdfsLoading && <div className="loading-center" style={{ flex: 1 }}><div className="spinner"></div></div>}
-                    <iframe src={modalTailoredPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />
+                    {modalTailoredPdfUrl && <iframe src={modalTailoredPdfUrl} style={{ width: '100%', flex: 1, border: 'none', background: '#333' }} />}
                  </div>
               </div>
             )}

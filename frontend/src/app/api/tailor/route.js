@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifyAuth } from '@/lib/auth';
 import { extractKeywords } from '@/lib/ai/keywordExtractor';
-import { tailorResumeBullets, tailorSkills } from '@/lib/ai/resumeTailor';
+import { tailorResumeBullets, tailorSkills, tailorLatexTemplate } from '@/lib/ai/resumeTailor';
 import { scoreResume } from '@/lib/ai/atsScorer';
 import { generateProjectBullets } from '@/lib/ai/projectBulletGenerator';
 import { findRelevantProjects } from '@/lib/ai/embeddings';
@@ -96,15 +96,17 @@ export async function POST(request) {
     if (!resume) return NextResponse.json({ error: 'Resume not found.' }, { status: 404 });
     if (!job) return NextResponse.json({ error: 'Job not found.' }, { status: 404 });
 
-    // 1. Extract keywords (cached in DB via extracted_skills column)
-    let extractedSkills = job.extracted_skills;
-    if (!extractedSkills) {
-      extractedSkills = await extractKeywords(job.description);
-      await supabaseAdmin.from('jobs').update({ extracted_skills: extractedSkills }).eq('id', job_id);
-    }
+    // 1 & 2. Keywords & Projects in Parallel
+    console.log('[TAILOR] Fetching keywords and relevant projects concurrently...');
+    const [extractedSkills, relevantProjects] = await Promise.all([
+       job.extracted_skills ? Promise.resolve(job.extracted_skills) : extractKeywords(job.description),
+       findRelevantProjects(job_id, auth.user.id, 3)
+    ]);
 
-    // 2. Find relevant projects (uses embedding cache internally)
-    const relevantProjects = await findRelevantProjects(job_id, auth.user.id, 3);
+    // Save keywords if they were just fetched
+    if (!job.extracted_skills && extractedSkills) {
+       await supabaseAdmin.from('jobs').update({ extracted_skills: extractedSkills }).eq('id', job_id);
+    }
 
     // 3. Tailor resume bullets — ONLY send relevant sections (section-level optimization)
     const resumeData = resume.structured_data || {};
@@ -117,53 +119,59 @@ export async function POST(request) {
     }
     console.log('[TAILOR] Found experience bullets:', allBullets.length);
 
-    const allSkillsForPrompt = [...(extractedSkills.required_skills || []), ...(extractedSkills.technologies || [])];
+    const allSkillsForPrompt = [...(extractedSkills?.required_skills || []), ...(extractedSkills?.technologies || [])];
     const allSkillsStr = allSkillsForPrompt.join(', ');
 
-    let tailoredBullets = { tailored_bullets: allBullets };
-    if (allBullets.length > 0) {
-      console.log('[TAILOR] Calling tailorResumeBullets...');
-      tailoredBullets = await tailorResumeBullets(allBullets, allSkillsForPrompt);
-      console.log('[TAILOR] Returned tailored bullets:', tailoredBullets?.tailored_bullets?.length);
-    } else {
-      console.log('[TAILOR] Skipping tailorResumeBullets because allBullets is empty');
-    }
-
-    // 3.5 Tailor Skills
     let tailoredSkills = resumeData.skills || [];
-    if (tailoredSkills.length > 0) {
-      console.log('[TAILOR] Calling tailorSkills...');
-      try {
-        const ts = await tailorSkills(tailoredSkills, allSkillsForPrompt);
-        if (ts && ts.tailored_skills) tailoredSkills = ts.tailored_skills;
-      } catch (e) {
-        console.warn('[TAILOR] tailorSkills failed:', e.message);
-      }
+
+    // 3. Parallelize Bullets & Skills Tailoring
+    console.log('[TAILOR] Tailoring bullets and skills concurrently...');
+    const [tailoredBulletsRes, tsRes] = await Promise.allSettled([
+       allBullets.length > 0 ? tailorResumeBullets(allBullets, allSkillsForPrompt) : Promise.resolve({ tailored_bullets: allBullets }),
+       tailoredSkills.length > 0 ? tailorSkills(tailoredSkills, allSkillsForPrompt) : Promise.resolve({ tailored_skills: tailoredSkills })
+    ]);
+
+    let tailoredBullets = { tailored_bullets: allBullets };
+    if (tailoredBulletsRes.status === 'fulfilled' && tailoredBulletsRes.value) {
+       tailoredBullets = tailoredBulletsRes.value;
+       console.log('[TAILOR] Returned tailored bullets:', tailoredBullets?.tailored_bullets?.length);
     }
 
-    // 4. Generate project bullets (dynamically tailored to job)
-    const projectBullets = [];
-    console.log('[TAILOR] Generating tailored project bullets for', relevantProjects.length, 'projects');
-    for (const project of relevantProjects) {
-      try {
-        const bullets = await generateProjectBullets(project, job.title, allSkillsStr);
-        projectBullets.push({ ...project, bullet_points: bullets.bullet_points });
-      } catch { 
-        projectBullets.push(project); 
-      }
+    if (tsRes.status === 'fulfilled' && tsRes.value?.tailored_skills) {
+       tailoredSkills = tsRes.value.tailored_skills;
+       console.log('[TAILOR] Returned tailored skills:', tailoredSkills.length);
     }
 
-    // 5. Original ATS Score
-    console.log('[TAILOR] Scoring original resume...');
-    const originalAtsResult = await scoreResume(resumeData, job.description);
-    console.log('[TAILOR] Original ATS Score:', originalAtsResult?.ats_score);
+    // 4. Parallelize Projects Generation Loop
+    console.log('[TAILOR] Generating tailored project bullets for', relevantProjects.length, 'projects concurrently...');
+    const projectBullets = await Promise.all(
+       relevantProjects.map(async (project) => {
+          try {
+             const bullets = await generateProjectBullets(project, job.title, allSkillsStr);
+             return { ...project, bullet_points: bullets.bullet_points };
+          } catch {
+             return project;
+          }
+       })
+    );
+
+    // 5 & 4.5. Concurrent scoring and direct LaTeX tailoring
+    console.log('[TAILOR] Scoring original and tailoring LaTeX concurrently...');
+    const [originalAtsResult, tailoredLatex] = await Promise.all([
+       scoreResume(resumeData, job.description),
+       resume.latex_template ? tailorLatexTemplate(resume.latex_template, job.description).catch(e => {
+          console.warn('[TAILOR] Direct LaTeX tailoring failed:', e.message);
+          return null;
+       }) : Promise.resolve(null)
+    ]);
 
     const tailoredData = {
       ...resumeData,
-      skills: tailoredSkills, // override original skills with tailored prioritization
+      skills: tailoredSkills, 
       tailored_experience_bullets: tailoredBullets.tailored_bullets,
       selected_projects: projectBullets,
       job_skills: extractedSkills,
+      latex_code: tailoredLatex 
     };
 
     // 6. Tailored ATS Score

@@ -13,10 +13,10 @@ export async function POST(request) {
       return NextResponse.json({ error: 'resume_id and job_id are required.' }, { status: 400 });
     }
 
-    const { data: resume } = await supabaseAdmin
-      .from('resumes').select('structured_data').eq('id', resume_id).eq('user_id', auth.user.id).single();
-    const { data: job } = await supabaseAdmin
-      .from('jobs').select('description').eq('id', job_id).eq('user_id', auth.user.id).single();
+    const [{ data: resume }, { data: job }] = await Promise.all([
+      supabaseAdmin.from('resumes').select('structured_data').eq('id', resume_id).eq('user_id', auth.user.id).single(),
+      supabaseAdmin.from('jobs').select('description').eq('id', job_id).eq('user_id', auth.user.id).single()
+    ]);
 
     if (!resume || !job) return NextResponse.json({ error: 'Resume or job not found.' }, { status: 404 });
 

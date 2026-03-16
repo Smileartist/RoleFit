@@ -16,7 +16,7 @@ export async function POST(request) {
     // Fetch tailored resume
     const { data: tailored } = await supabaseAdmin
       .from('tailored_resumes')
-      .select('*, resumes(structured_data, created_at)')
+      .select('*, resumes(structured_data, created_at, latex_template)')
       .eq('id', tailored_id)
       .eq('user_id', auth.user.id)
       .single();
@@ -28,7 +28,7 @@ export async function POST(request) {
     if (use_original) {
       const originalData = tailored.resumes?.structured_data;
       if (!originalData) return NextResponse.json({ error: 'Original data missing.' }, { status: 400 });
-      const originalLatex = generateLatexRaw(originalData);
+      const originalLatex = generateLatexRaw(originalData, tailored.resumes?.latex_template);
       return NextResponse.json({ latex_content: originalLatex }, { status: 200 });
     }
 
@@ -39,11 +39,11 @@ export async function POST(request) {
     }
 
     // If the user already edited the latex, or we already generated it, just return it.
-    if (tailored.latex_content) {
-      return NextResponse.json({ latex_content: tailored.latex_content }, { status: 200 });
-    }
+    // if (tailored.latex_content) {
+    //   return NextResponse.json({ latex_content: tailored.latex_content }, { status: 200 });
+    // }
 
-    const latexString = generateLatexRaw(tailoredData);
+    const latexString = generateLatexRaw(tailoredData, tailoredData.latex_code);
 
     // Save to database just in case the user wants to fetch it later
     await supabaseAdmin

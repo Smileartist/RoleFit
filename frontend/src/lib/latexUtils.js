@@ -31,6 +31,20 @@ function replaceSection(template, tag, data, renderFn) {
 }
 
 /**
+ * Ensures a URL has a protocol (http:// or https://)
+ */
+function ensureProtocol(url) {
+  if (!url) return '';
+  const trimmed = url.trim();
+  // Don't modify if it's already a full URL
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  // Fallback to https
+  return `https://${trimmed}`;
+}
+
+/**
  * Escapes characters for LaTeX
  */
 function escapeLatex(text) {
@@ -84,9 +98,9 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
   template = replaceTag(template, 'USER-LOCATION', escapeLatex(tailoredData.location || ''));
   
   // Social Links with Icons
-  const linkedin = tailoredData.linkedin ? `\\href{${tailoredData.linkedin}}{\\faLinkedin\\ LinkedIn}` : '';
-  const github = tailoredData.github ? `\\href{${tailoredData.github}}{\\faGithub\\ GitHub}` : '';
-  const portfolio = tailoredData.portfolio ? `\\href{${tailoredData.portfolio}}{\\faGlobe\\ Portfolio}` : '';
+  const linkedin = tailoredData.linkedin ? `\\href{${ensureProtocol(tailoredData.linkedin)}}{\\faLinkedin\\ LinkedIn}` : '';
+  const github = tailoredData.github ? `\\href{${ensureProtocol(tailoredData.github)}}{\\faGithub\\ GitHub}` : '';
+  const portfolio = tailoredData.portfolio ? `\\href{${ensureProtocol(tailoredData.portfolio)}}{\\faGlobe\\ Portfolio}` : '';
   
   template = replaceTag(template, 'USER-LINKEDIN', linkedin);
   template = replaceTag(template, 'USER-GITHUB', github);
@@ -130,10 +144,10 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
     data.forEach(proj => {
       let nameLine = `\\textbf{${escapeLatex(proj.name)}}`;
       
-      // Project Links (GitHub and Demo)
+      // Project Links (GitHub and Demo) - Using explicit text labels to prevent fontawesome crashes inside \href
       let projectLinks = '';
-      if (proj.github) projectLinks += `\\href{${proj.github}}{\\faGithub} `;
-      if (proj.url) projectLinks += `\\href{${proj.url}}{\\faExternalLinkAlt}`;
+      if (proj.github) projectLinks += `\\href{${ensureProtocol(proj.github)}}{[GitHub]} `;
+      if (proj.url) projectLinks += `\\href{${ensureProtocol(proj.url)}}{[Website]}`;
       if (projectLinks) nameLine += ` \\hfill ${projectLinks}`;
 
       let joinedTechStack = '';
@@ -178,6 +192,6 @@ export function generateLatexRaw(tailoredData, masterLatexTemplate = null) {
   return template
     .replace(/<<#[A-Z_]+>>/gi, '') 
     .replace(/<<\/[A-Z_]+>>/gi, '') 
-    .replace(/<<[A-Z_-]+>>/gi, '') 
-    .replace(/\[[A-Z_-]+\]/gi, ''); 
+    .replace(/<<[A-Z_\-]+>>/gi, '') 
+    .replace(/\[[A-Z_\-]+\]/g, '');
 }
